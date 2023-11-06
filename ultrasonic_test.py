@@ -1,5 +1,6 @@
 from machine import Pin, time_pulse_us
 import time
+import math
 
 # Pin numbers for ESP32 (adjust as needed)
 GPIO_TRIGGER = 26  # GPIO5 for trigger
@@ -24,12 +25,21 @@ def distance():
 
     return distance
 
+
+dist_arr = [0, 0]
+period = 0.1
+
 if __name__ == '__main__':
     try:
         while True:
             dist = distance()
-            print("Measured Distance = %.1f cm" % dist)
-            time.sleep(1)
+#             print("Measured Distance = %.1f cm" % dist)
+            dist_arr[1] = dist_arr[0]
+            dist_arr[0] = dist
+            if (dist_arr[0] is not 0) and (dist_arr[1] is not 0):
+                velo = (dist_arr[0]-dist_arr[1])/period
+                print("Measured Velocity = %.1f cm/s" % velo)
+            time.sleep(period)
  
     except KeyboardInterrupt:
         print("Measurement stopped by User")

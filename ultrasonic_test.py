@@ -28,6 +28,8 @@ def distance():
 
 dist_arr = [0, 0]
 period = 0.1
+i = 0
+activate = False
 
 if __name__ == '__main__':
     try:
@@ -38,7 +40,16 @@ if __name__ == '__main__':
             dist_arr[0] = dist
             if (dist_arr[0] is not 0) and (dist_arr[1] is not 0):
                 velo = (dist_arr[0]-dist_arr[1])/period
+                if math.fabs(velo) >= 5: # the absolute value of the velo
+                    i += 1
+                else:
+                    i = 0
+                
+                if i == 10:
+                    activate = True
                 print("Measured Velocity = %.1f cm/s" % velo)
+            if activate:
+                print('ACTIVATE!')
             time.sleep(period)
  
     except KeyboardInterrupt:

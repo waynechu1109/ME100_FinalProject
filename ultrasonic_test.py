@@ -5,9 +5,11 @@ import math
 # Pin numbers for ESP32 (adjust as needed)
 GPIO_TRIGGER = 26  # GPIO5 for trigger
 GPIO_ECHO = 25     # GPIO4 for echo
+LED = 12
 
 trigger = Pin(GPIO_TRIGGER, Pin.OUT)
 echo = Pin(GPIO_ECHO, Pin.IN)
+led = Pin(LED, mode=Pin.OUT)
 
 def distance():
     trigger.value(1)
@@ -25,6 +27,13 @@ def distance():
 
     return distance
 
+def blinking_led():
+    led_period = 0.5
+    for _ in range(5):
+        led.value(1)
+        time.sleep(led_period)
+        led.value(0)
+        time.sleep(led_period)
 
 dist_arr = [0, 0]
 period = 0.1
@@ -47,10 +56,14 @@ if __name__ == '__main__':
                 
                 if i == 10:
                     activate = True
+                    break
+                
                 print("Measured Velocity = %.1f cm/s" % velo)
-            if activate:
-                print('ACTIVATE!')
             time.sleep(period)
+        
+        if activate:
+                print('ACTIVATE!')
+                blinking_led()
  
     except KeyboardInterrupt:
         print("Measurement stopped by User")

@@ -1,7 +1,32 @@
+from umqtt.simple import MQTTClient
 from machine import Pin, time_pulse_us
 import time
 import math
 import uasyncio as asyncio
+import network
+import sys
+
+# Important: change the line below to a unique string,
+# e.g. your name & make corresponding change in mqtt_plot_host.py
+session = 'benshu/esp32/helloworld'
+BROKER = 'broker.hivemq.com'
+
+# check wifi connection
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+ip = wlan.ifconfig()[0]
+if ip == '0.0.0.0':
+    print("no wifi connection")
+    sys.exit()
+else:
+    print("connected to WiFi at IP", ip)
+
+# connect to MQTT broker
+print("Connecting to MQTT broker", BROKER, "...", end="")
+mqtt = MQTTClient(client_id="esp32", server=BROKER, port=1883)
+mqtt.connect()
+print("Connected!")
+
 
 # Pin numbers for ESP32 (adjust as needed)
 sensor_1_trigger = 26  # GPIO5 for trigger

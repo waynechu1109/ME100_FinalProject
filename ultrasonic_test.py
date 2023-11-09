@@ -106,6 +106,10 @@ if __name__ == '__main__':
             
         if activate:
             print('ACTIVATE!')
+            topic = "{}/data".format(session)
+            data = "{}".format(1)
+            print("send topic='{}' data='{}'".format(topic, data))
+            mqtt.publish(topic, data)
             blinking_led()
             activate = False
             i[0] = 0

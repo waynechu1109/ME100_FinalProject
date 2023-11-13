@@ -37,8 +37,9 @@ sensor_2_trigger = 27
 sensor_2_echo = 33
 
 LED = 12
+BUZ = 15
 
-buz = Pin(15, mode=Pin.OUT)
+buz = Pin(BUZ, mode=Pin.OUT)
 duty_cycle = 100
 L1 = PWM(buz,freq=500,duty=duty_cycle)
 
@@ -108,9 +109,8 @@ CS8 = 4435
 D8 = 4699
 DS8 = 4978
 
-music = [
-G5
-]
+music = [G5]
+rest = [1]
 
 dist_arr = [[0, 0], [0, 0]]
 period = 0.1
@@ -126,6 +126,7 @@ note_index = 0
 def tcb(timer):
     global duty_cycle
     global note_index
+    global activate
     if note_index < len(music)-1:
         note_index += 1
     else:
@@ -160,15 +161,12 @@ def blinking_led():
     led_period = 0.5
     buz_period = led_period*1000
     for _ in range(5):
+        
         led.value(1)
         time.sleep(led_period)
         
         t1 = Timer(1)
-        # Callback means that everytime the timer
-        # counts one, the corresponding function (in this case tcb)
-        # will be executed.
         t1.init(period=500, mode=t1.PERIODIC, callback=tcb)
-        
         
         led.value(0)
         time.sleep(led_period)
@@ -192,18 +190,12 @@ def detect(label):
             return
         
         print("Label:", label, "Measured Velocity = %.1f cm/s" % velo)
-    time.sleep(period)
-    
-# def buzzle():
-#     t1 = Timer(1)
-#     # Callback means that everytime the timer
-#     # counts one, the corresponding function (in this case tcb)
-#     # will be executed.
-#     t1.init(period=250, mode=t1.PERIODIC, callback=tcb)
-    
+    time.sleep(period)    
 
 if __name__ == '__main__':
+
     while True:
+        L1.freq(1)
         detect(1)
         detect(2)
             
@@ -215,5 +207,6 @@ if __name__ == '__main__':
             mqtt.publish(topic, data)
             blinking_led()
             activate = False
+            L1.freq(1)
             i[0] = 0
             i[1] = 0

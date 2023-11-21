@@ -38,7 +38,7 @@ MOTOR_M2A_PIN = machine.PWM(machine.Pin(4))
 MOTOR_M2B_PIN = machine.PWM(machine.Pin(5))
 
 # Motor speed (adjusted for safety)
-SPEED = 223
+SPEED = 323
 
 # Pin numbers for ESP32 (adjust as needed)
 sensor_1_trigger = 26  # GPIO5 for trigger
@@ -171,9 +171,18 @@ def detect(label):
 
 if __name__ == '__main__':
 
+    direction_index = 0
+    
     while True:
-        motor2_forward()
-        motor1_forward()
+        if direction_index == 20:
+            direction_index = 0
+        elif 0 <= direction_index and direction_index < 10:
+            motor1_forward()
+            motor2_forward()
+        else:
+            motor1_backward()
+            motor2_backward()
+            
         L1.freq(1)
         detect(1)
         detect(2)
@@ -186,7 +195,10 @@ if __name__ == '__main__':
             mqtt.publish(topic, data)
             response()
             activate = False
-#             t1.stop()
             L1.freq(1)
             i[0] = 0 # label for motion continuity
             i[1] = 0
+            
+        direction_index += 1
+        
+        

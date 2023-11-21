@@ -5,29 +5,47 @@ import utime
 MOTOR_M1A_PIN = machine.PWM(machine.Pin(32))
 MOTOR_M1B_PIN = machine.PWM(machine.Pin(14))
 
+MOTOR_M2A_PIN = machine.PWM(machine.Pin(4))
+MOTOR_M2B_PIN = machine.PWM(machine.Pin(5))
+
 # Motor speed (adjusted for safety)
-SPEED = 123
+SPEED = 223
 
 
-def motor_forward():
+def motor1_forward():
     MOTOR_M1A_PIN.duty(SPEED)
     MOTOR_M1B_PIN.duty(0)
 
-def motor_backward():
+def motor1_backward():
     MOTOR_M1A_PIN.duty(0)
     MOTOR_M1B_PIN.duty(SPEED)
 
-def motor_stop():
+def motor1_stop():
     MOTOR_M1A_PIN.duty(0)
     MOTOR_M1B_PIN.duty(0)
+    
+def motor2_forward():
+    MOTOR_M2A_PIN.duty(SPEED)
+    MOTOR_M2B_PIN.duty(0)
+
+def motor2_backward():
+    MOTOR_M2A_PIN.duty(0)
+    MOTOR_M2B_PIN.duty(SPEED)
+
+def motor2_stop():
+    MOTOR_M2A_PIN.duty(0)
+    MOTOR_M2B_PIN.duty(0)
 
 # Main loop
 while True:
-    motor_forward()
+    motor2_forward()
+    motor1_forward()
     utime.sleep(2)
 
-    motor_backward()
+    motor1_backward()
+    motor2_forward()
     utime.sleep(2)
 
-    motor_stop()
+    motor1_stop()
+    motor2_stop()
     utime.sleep(2)

@@ -6,6 +6,8 @@ import math
 import uasyncio as asyncio
 import network
 import sys
+import machine
+import utime
 
 # Important: change the line below to a unique string,
 # e.g. your name & make corresponding change in mqtt_plot_host.py
@@ -28,6 +30,15 @@ mqtt = MQTTClient(client_id="esp32", server=BROKER, port=1883)
 mqtt.connect()
 print("Connected!")
 
+# Define motor control pins for the Cytron Maker Drive
+MOTOR_M1A_PIN = machine.PWM(machine.Pin(32))
+MOTOR_M1B_PIN = machine.PWM(machine.Pin(14))
+
+MOTOR_M2A_PIN = machine.PWM(machine.Pin(4))
+MOTOR_M2B_PIN = machine.PWM(machine.Pin(5))
+
+# Motor speed (adjusted for safety)
+SPEED = 223
 
 # Pin numbers for ESP32 (adjust as needed)
 sensor_1_trigger = 26  # GPIO5 for trigger
@@ -45,7 +56,7 @@ buz = Pin(BUZ, mode=Pin.OUT)
 duty_cycle = 100
 L1 = PWM(buz,freq=500,duty=duty_cycle)
 
-music = [131]
+music = [50]
 rest = [1]
 
 dist_arr = [[0, 0], [0, 0]]
@@ -56,6 +67,30 @@ activate = False
 # trigger = Pin(sensor_1_trigger, Pin.OUT)
 # echo = Pin(sensor_1_echo, Pin.IN)
 led = Pin(LED, mode=Pin.OUT)
+
+def motor1_forward():
+    MOTOR_M1A_PIN.duty(SPEED)
+    MOTOR_M1B_PIN.duty(0)
+
+def motor1_backward():
+    MOTOR_M1A_PIN.duty(0)
+    MOTOR_M1B_PIN.duty(SPEED)
+
+def motor1_stop():
+    MOTOR_M1A_PIN.duty(0)
+    MOTOR_M1B_PIN.duty(0)
+    
+def motor2_forward():
+    MOTOR_M2A_PIN.duty(SPEED)
+    MOTOR_M2B_PIN.duty(0)
+
+def motor2_backward():
+    MOTOR_M2A_PIN.duty(0)
+    MOTOR_M2B_PIN.duty(SPEED)
+
+def motor2_stop():
+    MOTOR_M2A_PIN.duty(0)
+    MOTOR_M2B_PIN.duty(0)
 
 note_index = 0
 # This is the callback function
@@ -93,18 +128,23 @@ def distance(label):
 
     return distance
 
-def blinking_led():
+def response():
     global t1
     led_period = 0.5
 #     buz_period = led_period*1000
     
     t1.init(period=500, mode=t1.PERIODIC, callback=tcb) # buzzer on
     
-    for _ in range(5):
+    for _ in range(5):  # light LED and drive motors
         
+        
+        motor2_stop()
+        motor1_stop()
         led.value(1)
         time.sleep(led_period)       
                 
+        motor2_stop()
+        motor1_stop()
         led.value(0)
         time.sleep(led_period)
         
@@ -132,6 +172,8 @@ def detect(label):
 if __name__ == '__main__':
 
     while True:
+        motor2_forward()
+        motor1_forward()
         L1.freq(1)
         detect(1)
         detect(2)
@@ -142,7 +184,7 @@ if __name__ == '__main__':
             data = "{}".format("WARNING!!!")
             print("send topic='{}' data='{}'".format(topic, data))
             mqtt.publish(topic, data)
-            blinking_led()
+            response()
             activate = False
 #             t1.stop()
             L1.freq(1)

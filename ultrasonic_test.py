@@ -38,7 +38,7 @@ MOTOR_M2A_PIN = machine.PWM(machine.Pin(4))
 MOTOR_M2B_PIN = machine.PWM(machine.Pin(5))
 
 # Motor speed (adjusted for safety)
-SPEED = 323
+SPEED = 200
 
 # Pin numbers for ESP32 (adjust as needed)
 sensor_1_trigger = 26  # GPIO5 for trigger
@@ -56,7 +56,7 @@ buz = Pin(BUZ, mode=Pin.OUT)
 duty_cycle = 100
 L1 = PWM(buz,freq=500,duty=duty_cycle)
 
-music = [50]
+music = [5]
 rest = [1]
 
 dist_arr = [[0, 0], [0, 0]]
@@ -174,14 +174,16 @@ if __name__ == '__main__':
     direction_index = 0
     
     while True:
-        if direction_index == 20:
+        if direction_index == 4:
             direction_index = 0
-        elif 0 <= direction_index and direction_index < 10:
             motor1_forward()
-            motor2_forward()
+            motor2_backward()
+        elif 0 <= direction_index and direction_index <= 1:
+            motor1_forward()
+            motor2_backward()
         else:
             motor1_backward()
-            motor2_backward()
+            motor2_forward()
             
         L1.freq(1)
         detect(1)

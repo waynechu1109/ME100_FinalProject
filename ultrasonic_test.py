@@ -8,11 +8,7 @@ import network
 import sys
 import machine
 import utime
-
-# Important: change the line below to a unique string,
-# e.g. your name & make corresponding change in mqtt_plot_host.py
-session = 'benshu/esp32/helloworld'
-BROKER = 'broker.hivemq.com'
+import umqtt1
 
 # check wifi connection
 wlan = network.WLAN(network.STA_IF)
@@ -23,6 +19,30 @@ if ip == '0.0.0.0':
     sys.exit()
 else:
     print("connected to WiFi at IP", ip)
+
+# Set up Adafruit connection
+myMqttClient = "TestClient"
+adafruitIoUrl = "io.adafruit.com"
+
+# CHANGE HERE
+adafruitUsername = "Bensons"
+adafruitAioKey = "aio_mJJE961kZCervqJMjU4ljV8qbYfL"
+
+# Connect to Adafruit server
+print("Connecting to Adafruit")
+mqtt_adafruit = umqtt1.MQTTClient(myMqttClient, adafruitIoUrl, 0, adafruitUsername, adafruitAioKey)
+time.sleep(0.5)
+mqtt_adafruit.connect()
+print("Connected!")
+
+# CHANGE HERE
+feedName = "Bensons/feeds/benshu-cao"
+
+# Set up MQTT connection
+# Important: change the line below to a unique string,
+# e.g. your name & make corresponding change in mqtt_plot_host.py
+session = 'benshu/esp32/helloworld'
+BROKER = 'broker.hivemq.com'
 
 # connect to MQTT broker
 print("Connecting to MQTT broker", BROKER, "...", end="")
@@ -56,7 +76,7 @@ buz = Pin(BUZ, mode=Pin.OUT)
 duty_cycle = 100
 L1 = PWM(buz,freq=500,duty=duty_cycle)
 
-music = [5]
+music = [20]
 rest = [1]
 
 dist_arr = [[0, 0], [0, 0]]
@@ -100,6 +120,7 @@ def tcb(timer):
     global activate
 
     if activate:
+#         for i in range(3):
         L1.freq(music[0])
     else:
         L1.freq(rest[0])
@@ -157,7 +178,7 @@ def detect(label):
     dist_arr[label-1][0] = dist_1
     if (dist_arr[label-1][0] is not 0) and (dist_arr[label-1][1] is not 0):
         velo = (dist_arr[label-1][0]-dist_arr[label-1][1])/period
-        if math.fabs(velo) >= 5: # the absolute value of the velo
+        if math.fabs(velo) >= 50: # the absolute value of the velo
             i[label-1] += 1
         else:
             i[label-1] = 0
@@ -195,6 +216,8 @@ if __name__ == '__main__':
             data = "{}".format("WARNING!!!")
             print("send topic='{}' data='{}'".format(topic, data))
             mqtt.publish(topic, data)
+            mqtt_adafruit.publish(feedName,"WARNING!!!(adafruit)")
+            print("Published {} to {}.".format("WARNING!!!(adafruit)",feedName))
             response()
             activate = False
             L1.freq(1)

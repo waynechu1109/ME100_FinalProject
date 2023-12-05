@@ -9,7 +9,7 @@ print('running boot')
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-password = 'uyEpBR(0'
+password = '6Exz)Cs3'
 
 # attempt to connect 20 times
 # print a fail message or a success message

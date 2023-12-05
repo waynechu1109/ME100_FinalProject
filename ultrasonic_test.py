@@ -26,11 +26,12 @@ adafruitIoUrl = "io.adafruit.com"
 
 # CHANGE HERE
 adafruitUsername = "Bensons"
-adafruitAioKey = "aio_mJJE961kZCervqJMjU4ljV8qbYfL"
+adafruitAioKey = "aio_faVI67atIeI3Mj8siN3VwwjMXoHH"
 
 # Connect to Adafruit server
 print("Connecting to Adafruit")
-mqtt_adafruit = umqtt1.MQTTClient(myMqttClient, adafruitIoUrl, 0, adafruitUsername, adafruitAioKey)
+mqtt_adafruit = umqtt1.MQTTClient(myMqttClient, adafruitIoUrl, 0,
+                                  adafruitUsername, adafruitAioKey)
 time.sleep(0.5)
 mqtt_adafruit.connect()
 print("Connected!")
@@ -178,12 +179,12 @@ def detect(label):
     dist_arr[label-1][0] = dist_1
     if (dist_arr[label-1][0] is not 0) and (dist_arr[label-1][1] is not 0):
         velo = (dist_arr[label-1][0]-dist_arr[label-1][1])/period
-        if math.fabs(velo) >= 50: # the absolute value of the velo
+        if math.fabs(velo) >= 10: # the absolute value of the velo
             i[label-1] += 1
         else:
             i[label-1] = 0
         
-        if i[label-1] == 10:
+        if i[label-1] == 5:
             activate = True
             return
         
